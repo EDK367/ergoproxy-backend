@@ -30,6 +30,7 @@ public record RegisterRequest(
         String password,
 
         @NotBlank(message = "Phone number is required")
+        @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Invalid phone number format")
         String phoneNumber
 ) {
 }

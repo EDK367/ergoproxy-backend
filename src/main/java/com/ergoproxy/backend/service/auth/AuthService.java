@@ -3,7 +3,6 @@ package com.ergoproxy.backend.service.auth;
 import com.ergoproxy.backend.dto.request.LoginRequest;
 import com.ergoproxy.backend.dto.request.RegisterRequest;
 import com.ergoproxy.backend.dto.response.AuthResponse;
-import com.ergoproxy.backend.model.Role;
 import com.ergoproxy.backend.model.User;
 import com.ergoproxy.backend.repository.RoleRepository;
 import com.ergoproxy.backend.repository.UserRepository;
@@ -11,10 +10,11 @@ import com.ergoproxy.backend.security.CustomUserDetails;
 import com.ergoproxy.backend.security.JwtService;
 import com.ergoproxy.backend.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
+import com.ergoproxy.backend.exception.CustomException;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -45,7 +45,6 @@ public class AuthService {
         return AuthResponse.builder()
                 .token(token)
                 .username(user.getUsername())
-                .email(user.getEmail())
                 .name(user.getName())
                 .lastname(user.getLastname())
                 .role(user.getRole().getName())
@@ -54,7 +53,15 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.findByUsername(request.username()).isPresent()) {
-            throw new RuntimeException("Username already exists: " + request.username());
+            throw new CustomException(HttpStatus.CONFLICT, "Username already exists: " + request.username());
+        }
+
+        if (request.email() != null && userRepository.existsByEmail(request.email())) {
+            throw new CustomException(HttpStatus.CONFLICT, "Email already exists");
+        }
+
+        if (request.phoneNumber() != null && userRepository.existsByPhoneNumber(request.phoneNumber())) {
+            throw new CustomException(HttpStatus.CONFLICT, "Phone number already exists");
         }
 
         User user = User.builder()
@@ -64,7 +71,7 @@ public class AuthService {
                 .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
                 .enabled(true)
-                .role(roleRepository.findById(2L).orElseThrow(() -> new RuntimeException("Role not found: 2")))
+                .role(roleRepository.findById(2L).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "Role not found: 2")))
                 .build();
 
         userRepository.save(user);
@@ -76,7 +83,6 @@ public class AuthService {
          return AuthResponse.builder()
                 .token(token)
                 .username(user.getUsername())
-                .email(user.getEmail())
                 .name(user.getName())
                 .lastname(user.getLastname())
                 .role(user.getRole().getName())
