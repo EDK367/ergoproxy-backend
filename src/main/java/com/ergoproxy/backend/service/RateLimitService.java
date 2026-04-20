@@ -16,7 +16,7 @@ public class RateLimitService {
     private final Map<String, Integer> counterIpMap = new ConcurrentHashMap<>();
     private final Map<String, Instant> blockedIpMap = new ConcurrentHashMap<>();
 
-    private static final int TOKENS_FOR_WINDOWS = 10;
+    private static final int TOKENS_FOR_WINDOWS = 60;
     private static final Duration LEVEL_0 = Duration.ofMinutes(1);
     private static final Duration LEVEL_1 = Duration.ofMinutes(2);
     private static final Duration LEVEL_2 = Duration.ofMinutes(5);

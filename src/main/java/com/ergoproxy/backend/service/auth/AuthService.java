@@ -7,7 +7,7 @@ import com.ergoproxy.backend.model.User;
 import com.ergoproxy.backend.repository.RoleRepository;
 import com.ergoproxy.backend.repository.UserRepository;
 import com.ergoproxy.backend.security.CustomUserDetails;
-import com.ergoproxy.backend.security.JwtService;
+import com.ergoproxy.backend.service.JwtService;
 import com.ergoproxy.backend.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import com.ergoproxy.backend.exception.CustomException;

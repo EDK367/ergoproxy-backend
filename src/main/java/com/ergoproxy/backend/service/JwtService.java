@@ -1,4 +1,4 @@
-package com.ergoproxy.backend.security;
+package com.ergoproxy.backend.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

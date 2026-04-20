@@ -61,7 +61,7 @@ public class User {
     @Column(name = "metadata", columnDefinition = "TEXT")
     private String metadata;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", referencedColumnName = "id", nullable = false)
     private Role role;
 
@@ -69,5 +69,8 @@ public class User {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<LogsInfo> logs;
 
 }
