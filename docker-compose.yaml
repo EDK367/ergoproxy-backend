@@ -1,5 +1,7 @@
 # docker compose up -d --build
 # usar --build para reconstruir
+# luego de crear la base de datos usar este script
+# CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 version: '3.9'
 
 services:
