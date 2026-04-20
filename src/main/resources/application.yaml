@@ -1,0 +1,88 @@
+server:
+  port: 8080
+  address: 0.0.0.0
+spring:
+  application:
+    name: ergoproxy-backend
+
+  datasource:
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 30000
+      connection-timeout: 20000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+      enabled: true
+      locations: classpath:db/migration
+
+  security:
+    user:
+      name: disabled
+    password: disabled
+
+
+  web:
+    error:
+      include-binding-errors: never
+      include-message: never
+      include-stacktrace: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+    health:
+        show-details: never
+
+ergoproxy:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION}
+
+  pepper:
+    secret: ${PEPPER}
+
+
+# esto de aca se debe cambiar a warn menos root y com.ergoproxy
+logging:
+  level:
+    root: info
+    com.ergoproxy: info
+    org:
+        springframework:
+            security: debug
+            web: debug
+        com.zaxxer:
+            hikari: debug
+        flyway: debug
+        hibernate:
+            SQL: debug
+            type:
+            descriptor:
+                sql:
+                BasicBinder: trace
+
+pattern:
+  #console: "%d{ISO8601} %5p [%t] %c{1.}: %m%n"
+  console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%t] %c{1.} %M:%L - %m%n"
+
+file:
+  name: logs/ergoproxy-backend.log
+  max-size: 10MB
+  max-history: 30
