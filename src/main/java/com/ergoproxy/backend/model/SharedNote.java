@@ -26,12 +26,10 @@ public class SharedNote {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    // Nota compartida
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "note_id", nullable = false)
     private Note note;
 
-    // Usuario con quien se comparte
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_shared_id", nullable = false)
     private User userShared;

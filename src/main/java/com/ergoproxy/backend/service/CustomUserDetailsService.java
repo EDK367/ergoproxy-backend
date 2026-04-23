@@ -1,9 +1,11 @@
 package com.ergoproxy.backend.service;
 
+import com.ergoproxy.backend.exception.CustomException;
 import com.ergoproxy.backend.security.CustomUserDetails;
 import com.ergoproxy.backend.model.User;
 import com.ergoproxy.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,17 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public CustomUserDetails loadUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+                .orElseThrow(() -> new CustomException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Invalid credentials"
+                ));
+
+        if (!user.isEnabled()) {
+            throw new CustomException(
+                    HttpStatus.FORBIDDEN,
+                    "User account is disabled"
+            );
+        }
 
         return new CustomUserDetails(user);
     }

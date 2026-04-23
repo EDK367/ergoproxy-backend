@@ -14,11 +14,14 @@ import com.ergoproxy.backend.exception.CustomException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -29,14 +32,25 @@ public class AuthService {
     private final CustomUserDetailsService customUserDetailsService;
 
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.username(),
-                        request.password()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.username(),
+                            request.password()
+                    )
+            );
+        } catch (BadCredentialsException e) {
+            throw new CustomException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+        }
 
         CustomUserDetails userDetails = customUserDetailsService.loadUserByUsername(request.username());
+
+        if (!userDetails.isEnabled()) {
+            throw new CustomException(
+                    HttpStatus.FORBIDDEN,
+                    "User account is disabled"
+            );
+        }
 
         String token = jwtService.generateToken(userDetails);
 
@@ -53,15 +67,24 @@ public class AuthService {
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.findByUsername(request.username()).isPresent()) {
-            throw new CustomException(HttpStatus.CONFLICT, "Username already exists: " + request.username());
+            throw new CustomException(
+                    HttpStatus.CONFLICT,
+                    "Username already exists"
+            );
         }
 
         if (request.email() != null && userRepository.existsByEmail(request.email())) {
-            throw new CustomException(HttpStatus.CONFLICT, "Email already exists");
+            throw new CustomException(
+                    HttpStatus.CONFLICT,
+                    "Email already exists"
+            );
         }
 
         if (request.phoneNumber() != null && userRepository.existsByPhoneNumber(request.phoneNumber())) {
-            throw new CustomException(HttpStatus.CONFLICT, "Phone number already exists");
+            throw new CustomException(
+                    HttpStatus.CONFLICT,
+                    "Phone number already exists"
+            );
         }
 
         User user = User.builder()
@@ -70,17 +93,21 @@ public class AuthService {
                 .email(request.email())
                 .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
+                .phoneNumber(request.phoneNumber())
                 .enabled(true)
-                .role(roleRepository.findById(2L).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "Role not found: 2")))
+                .role(roleRepository.findById(2L)
+                        .orElseThrow(() -> new CustomException(
+                                HttpStatus.INTERNAL_SERVER_ERROR,
+                                "Default role not found"
+                        )))
                 .build();
 
         userRepository.save(user);
 
         CustomUserDetails userDetails = customUserDetailsService.loadUserSave(user);
-
         String token = jwtService.generateToken(userDetails);
 
-         return AuthResponse.builder()
+        return AuthResponse.builder()
                 .token(token)
                 .username(user.getUsername())
                 .name(user.getName())
