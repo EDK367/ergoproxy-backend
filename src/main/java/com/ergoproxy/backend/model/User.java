@@ -28,6 +28,10 @@ public class User {
     @Column(columnDefinition = "UUID DEFAULT gen_random_uuid()", updatable = false, nullable = false)
     private UUID id;
 
+    @UuidGenerator
+    @Column(name= "id_friend", columnDefinition = "UUID DEFAULT gen_random_uuid()", updatable = false, nullable = false)
+    private UUID idFriend; 
+
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 

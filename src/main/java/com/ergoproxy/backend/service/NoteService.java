@@ -39,12 +39,12 @@ public class NoteService {
     public List<NoteResponseDTO> getMyNotes() {
         User authenticatedUser = getAuthenticatedUser();
         
-        List<Note> ownNotes = noteRepository.findByUserIdEnabled(authenticatedUser.getId());
+        List<Note> ownNotes = noteRepository.findByIdFriendEnabled(authenticatedUser.getIdFriend());
         List<NoteResponseDTO> ownNoteDTOs = ownNotes.stream()
                 .map(note -> this.convertToDTO(note, authenticatedUser, true, false))
                 .collect(Collectors.toList());
 
-        List<SharedNote> sharedNotes = sharedNoteRepository.findSharedNotesForUser(authenticatedUser.getId());
+        List<SharedNote> sharedNotes = sharedNoteRepository.findSharedNotesForUser(authenticatedUser.getIdFriend());
         List<NoteResponseDTO> sharedNoteDTOs = sharedNotes.stream()
                 .map(sharedNote -> this.convertToDTO(sharedNote.getNote(), authenticatedUser, false, true))
                 .collect(Collectors.toList());
@@ -62,7 +62,7 @@ public class NoteService {
         boolean isShared = false;
         
         if (!isOwner) {
-            Optional<SharedNote> sharedNote = sharedNoteRepository.findByNoteIdAndUserSharedId(noteId, authenticatedUser.getId());
+            Optional<SharedNote> sharedNote = sharedNoteRepository.findByNoteIdAndUserSharedIdFriend(noteId, authenticatedUser.getIdFriend());
             isShared = sharedNote.isPresent() && sharedNote.get().isEnabled();
         }
         
@@ -87,7 +87,7 @@ public class NoteService {
     public NoteResponseDTO updateNote(UUID noteId, UpdateNoteDTO updateNoteDTO) {
         User authenticatedUser = getAuthenticatedUser();
 
-        Note note = noteRepository.findByIdAndUserIdEnabled(noteId, authenticatedUser.getId())
+        Note note = noteRepository.findByIdAndIdFriendEnabled(noteId, authenticatedUser.getIdFriend())
                 .orElseThrow(() -> new CustomException(
                         HttpStatus.FORBIDDEN,
                         "You don't have permission to update this note or note does not exist"
@@ -105,7 +105,7 @@ public class NoteService {
     public void deleteNote(UUID noteId) {
         User authenticatedUser = getAuthenticatedUser();
 
-        Note note = noteRepository.findByIdAndUserIdEnabled(noteId, authenticatedUser.getId())
+        Note note = noteRepository.findByIdAndIdFriendEnabled(noteId, authenticatedUser.getIdFriend())
                 .orElseThrow(() -> new CustomException(
                         HttpStatus.FORBIDDEN,
                         "You don't have permission to delete this note or note does not exist"
@@ -124,13 +124,13 @@ public class NoteService {
     public SharedNoteResponseDTO shareNote(UUID noteId, ShareNoteDTO shareNoteDTO) {
         User authenticatedUser = getAuthenticatedUser();
 
-        Note note = noteRepository.findByIdAndUserIdEnabled(noteId, authenticatedUser.getId())
+        Note note = noteRepository.findByIdAndIdFriendEnabled(noteId, authenticatedUser.getIdFriend())
                 .orElseThrow(() -> new CustomException(
                         HttpStatus.FORBIDDEN,
                         "You don't have permission to share this note or note does not exist"
                 ));
 
-        User userToShare = userRepository.findByIdEnabled(shareNoteDTO.userId())
+        User userToShare = userRepository.findByIdFriendEnabled(shareNoteDTO.idFriend())
                 .orElseThrow(() -> new CustomException(
                         HttpStatus.NOT_FOUND,
                         "User not found or not enabled"
@@ -143,7 +143,7 @@ public class NoteService {
             );
         }
 
-        if (sharedNoteRepository.findByNoteIdAndUserSharedId(noteId, userToShare.getId()).isPresent()) {
+        if (sharedNoteRepository.findByNoteIdAndUserSharedIdFriend(noteId, userToShare.getIdFriend()).isPresent()) {
             throw new CustomException(
                     HttpStatus.CONFLICT,
                     "This note is already shared with this user"
@@ -160,19 +160,19 @@ public class NoteService {
         return this.convertSharedNoteToDTO(savedSharedNote);
     }
 
-    public void unshareNote(UUID noteId, UUID userId) {
+    public void unshareNote(UUID noteId, UUID idFriend) {
         User authenticatedUser = getAuthenticatedUser();
 
-        Note note = noteRepository.findByIdAndUserIdEnabled(noteId, authenticatedUser.getId())
+        Note note = noteRepository.findByIdAndIdFriendEnabled(noteId, authenticatedUser.getIdFriend())
                 .orElseThrow(() -> new CustomException(
                         HttpStatus.FORBIDDEN,
                         "You don't have permission to modify sharing for this note"
                 ));
 
-        SharedNote sharedNote = sharedNoteRepository.findByNoteIdAndOwnerIdAndUserSharedId(
+        SharedNote sharedNote = sharedNoteRepository.findByNoteIdAndOwnerIdFriendAndUserSharedIdFriend(
                 noteId,
-                authenticatedUser.getId(),
-                userId
+                authenticatedUser.getIdFriend(),
+                idFriend
         ).orElseThrow(() -> new CustomException(
                 HttpStatus.NOT_FOUND,
                 "This note is not shared with this user"
@@ -185,7 +185,7 @@ public class NoteService {
     public List<SharedNoteResponseDTO> getNoteShares(UUID noteId) {
         User authenticatedUser = getAuthenticatedUser();
 
-        noteRepository.findByIdAndUserIdEnabled(noteId, authenticatedUser.getId())
+        noteRepository.findByIdAndIdFriendEnabled(noteId, authenticatedUser.getIdFriend())
                 .orElseThrow(() -> new CustomException(
                         HttpStatus.FORBIDDEN,
                         "You don't have permission to view shares for this note"
@@ -197,12 +197,12 @@ public class NoteService {
     }
 
     private Note getNoteWithAccess(UUID noteId, User user) {
-        Optional<Note> ownNote = noteRepository.findByIdAndUserIdEnabled(noteId, user.getId());
+        Optional<Note> ownNote = noteRepository.findByIdAndIdFriendEnabled(noteId, user.getIdFriend());
         if (ownNote.isPresent()) {
             return ownNote.get();
         }
 
-        Optional<SharedNote> sharedNote = sharedNoteRepository.findByNoteIdAndUserSharedId(noteId, user.getId());
+        Optional<SharedNote> sharedNote = sharedNoteRepository.findByNoteIdAndUserSharedIdFriend(noteId, user.getIdFriend());
         if (sharedNote.isPresent() && sharedNote.get().isEnabled()) {
             return sharedNote.get().getNote();
         }
@@ -233,7 +233,7 @@ public class NoteService {
                 .title(note.getTitle())
                 .content(note.getContent())
                 .important(note.isImportant())
-                .userId(note.getUser().getId())
+                .idFriend(note.getUser().getIdFriend())
                 .username(note.getUser().getUsername())
                 .createdAt(note.getCreatedAt())
                 .updatedAt(note.getUpdatedAt())
@@ -247,9 +247,9 @@ public class NoteService {
                 .id(sharedNote.getId())
                 .noteId(sharedNote.getNote().getId())
                 .noteTitle(sharedNote.getNote().getTitle())
-                .noteOwnerId(sharedNote.getNote().getUser().getId())
+                .noteOwnerIdFriend(sharedNote.getNote().getUser().getIdFriend())
                 .noteOwnerUsername(sharedNote.getNote().getUser().getUsername())
-                .userSharedId(sharedNote.getUserShared().getId())
+                .userSharedIdFriend(sharedNote.getUserShared().getIdFriend())
                 .userSharedUsername(sharedNote.getUserShared().getUsername())
                 .createdAt(sharedNote.getCreatedAt())
                 .enabled(sharedNote.isEnabled())

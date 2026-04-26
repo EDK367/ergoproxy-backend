@@ -13,18 +13,18 @@ import java.util.UUID;
 @Repository
 public interface SharedNoteRepository extends JpaRepository<SharedNote, Long> {
 
-    @Query("SELECT sn FROM SharedNote sn WHERE sn.userShared.id = :userId AND sn.enabled = true ORDER BY sn.createdAt DESC")
-    List<SharedNote> findSharedNotesForUser(@Param("userId") UUID userId);
+    @Query("SELECT sn FROM SharedNote sn WHERE sn.userShared.idFriend = :idFriend AND sn.enabled = true ORDER BY sn.createdAt DESC")
+    List<SharedNote> findSharedNotesForUser(@Param("idFriend") UUID idFriend);
 
-    @Query("SELECT sn FROM SharedNote sn WHERE sn.note.user.id = :userId AND sn.enabled = true ORDER BY sn.createdAt DESC")
-    List<SharedNote> findSharedNotesByUser(@Param("userId") UUID userId);
+    @Query("SELECT sn FROM SharedNote sn WHERE sn.note.user.idFriend = :idFriend AND sn.enabled = true ORDER BY sn.createdAt DESC")
+    List<SharedNote> findSharedNotesByUser(@Param("idFriend") UUID idFriend);
 
-    @Query("SELECT sn FROM SharedNote sn WHERE sn.note.id = :noteId AND sn.userShared.id = :userId AND sn.enabled = true")
-    Optional<SharedNote> findByNoteIdAndUserSharedId(@Param("noteId") UUID noteId, @Param("userId") UUID userId);
+    @Query("SELECT sn FROM SharedNote sn WHERE sn.note.id = :noteId AND sn.userShared.idFriend = :idFriend AND sn.enabled = true")
+    Optional<SharedNote> findByNoteIdAndUserSharedIdFriend(@Param("noteId") UUID noteId, @Param("idFriend") UUID idFriend);
 
     @Query("SELECT sn FROM SharedNote sn WHERE sn.note.id = :noteId AND sn.enabled = true ORDER BY sn.createdAt DESC")
     List<SharedNote> findSharesByNoteId(@Param("noteId") UUID noteId);
 
-    @Query("SELECT sn FROM SharedNote sn WHERE sn.note.id = :noteId AND sn.note.user.id = :ownerId AND sn.userShared.id = :userSharedId AND sn.enabled = true")
-    Optional<SharedNote> findByNoteIdAndOwnerIdAndUserSharedId(@Param("noteId") UUID noteId, @Param("ownerId") UUID ownerId, @Param("userSharedId") UUID userSharedId);
+    @Query("SELECT sn FROM SharedNote sn WHERE sn.note.id = :noteId AND sn.note.user.idFriend = :ownerIdFriend AND sn.userShared.idFriend = :userSharedIdFriend AND sn.enabled = true")
+    Optional<SharedNote> findByNoteIdAndOwnerIdFriendAndUserSharedIdFriend(@Param("noteId") UUID noteId, @Param("ownerIdFriend") UUID ownerIdFriend, @Param("userSharedIdFriend") UUID userSharedIdFriend);
 }

@@ -10,9 +10,9 @@ public record SharedNoteResponseDTO(
         Long id,
         UUID noteId,
         String noteTitle,
-        UUID noteOwnerId,
+        UUID noteOwnerIdFriend,
         String noteOwnerUsername,
-        UUID userSharedId,
+        UUID userSharedIdFriend,
         String userSharedUsername,
         LocalDateTime createdAt,
         boolean enabled

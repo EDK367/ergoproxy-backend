@@ -53,7 +53,7 @@ public class UserService {
         User authenticatedUser = getAuthenticatedUser();
 
         return UserProfileDTO.builder()
-                .id(authenticatedUser.getId())
+                .id(authenticatedUser.getIdFriend())
                 .username(authenticatedUser.getUsername())
                 .name(authenticatedUser.getName())
                 .lastname(authenticatedUser.getLastname())

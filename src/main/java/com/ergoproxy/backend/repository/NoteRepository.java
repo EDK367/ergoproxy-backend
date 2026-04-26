@@ -13,15 +13,15 @@ import java.util.UUID;
 @Repository
 public interface NoteRepository extends JpaRepository<Note, UUID> {
 
-    @Query("SELECT n FROM Note n WHERE n.user.id = :userId AND n.enabled = true ORDER BY n.createdAt DESC")
-    List<Note> findByUserIdEnabled(@Param("userId") UUID userId);
+    @Query("SELECT n FROM Note n WHERE n.user.idFriend = :idFriend AND n.enabled = true ORDER BY n.createdAt DESC")
+    List<Note> findByIdFriendEnabled(@Param("idFriend") UUID idFriend);
 
-    @Query("SELECT n FROM Note n WHERE n.id = :noteId AND n.user.id = :userId AND n.enabled = true")
-    Optional<Note> findByIdAndUserIdEnabled(@Param("noteId") UUID noteId, @Param("userId") UUID userId);
+    @Query("SELECT n FROM Note n WHERE n.id = :noteId AND n.user.idFriend = :idFriend AND n.enabled = true")
+    Optional<Note> findByIdAndIdFriendEnabled(@Param("noteId") UUID noteId, @Param("idFriend") UUID idFriend);
 
-    @Query("SELECT n FROM Note n WHERE n.user.id = :userId AND n.important = true AND n.enabled = true ORDER BY n.createdAt DESC")
-    List<Note> findImportantByUserId(@Param("userId") UUID userId);
+    @Query("SELECT n FROM Note n WHERE n.user.idFriend = :idFriend AND n.important = true AND n.enabled = true ORDER BY n.createdAt DESC")
+    List<Note> findImportantByIdFriend(@Param("idFriend") UUID idFriend);
 
-    @Query("SELECT n FROM Note n WHERE n.user.id = :userId AND LOWER(n.title) LIKE LOWER(CONCAT('%', :title, '%')) AND n.enabled = true ORDER BY n.createdAt DESC")
-    List<Note> findByUserIdAndTitleContaining(@Param("userId") UUID userId, @Param("title") String title);
+    @Query("SELECT n FROM Note n WHERE n.user.idFriend = :idFriend AND LOWER(n.title) LIKE LOWER(CONCAT('%', :title, '%')) AND n.enabled = true ORDER BY n.createdAt DESC")
+    List<Note> findByIdFriendAndTitleContaining(@Param("idFriend") UUID idFriend, @Param("title") String title);
 }

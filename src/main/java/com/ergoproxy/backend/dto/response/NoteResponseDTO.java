@@ -11,7 +11,7 @@ public record NoteResponseDTO(
         String title,
         String content,
         boolean important,
-        UUID userId,
+        UUID idFriend,
         String username,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,

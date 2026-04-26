@@ -6,6 +6,6 @@ import java.util.UUID;
 
 public record ShareNoteDTO(
 
-        @NotNull(message = "User ID is required")
-        UUID userId
+        @NotNull(message = "Friend ID is required")
+        UUID idFriend
 ) {}

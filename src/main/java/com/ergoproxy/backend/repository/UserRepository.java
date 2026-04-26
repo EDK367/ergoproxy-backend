@@ -26,4 +26,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT u FROM User u WHERE u.id = :id AND u.enabled = true")
     Optional<User> findByIdEnabled(@Param("id") UUID id);
+
+    @Query("SELECT u FROM User u WHERE u.idFriend = :idFriend AND u.enabled = true")
+    Optional<User> findByIdFriendEnabled(@Param("idFriend") UUID idFriend);
 }

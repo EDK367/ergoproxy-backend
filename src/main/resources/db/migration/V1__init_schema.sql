@@ -15,6 +15,8 @@ CREATE TABLE roles (
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
+    id_friend UUID NOT NULL DEFAULT gen_random_uuid(),
+
     name VARCHAR(50) NOT NULL,
     lastname VARCHAR(50) NOT NULL,
 

@@ -87,12 +87,12 @@ public class NoteController {
                 .build());
     }
 
-    @DeleteMapping("/{id}/share/{userId}")
+    @DeleteMapping("/{id}/share/{idFriend}")
     public ResponseEntity<Response<Void>> unshareNote(
             @PathVariable UUID id,
-            @PathVariable UUID userId
+            @PathVariable UUID idFriend
     ) {
-        noteService.unshareNote(id, userId);
+        noteService.unshareNote(id, idFriend);
         return ResponseEntity.ok(Response.<Void>builder()
                 .status(HttpStatus.OK.value())
                 .message("Note unshared successfully")
