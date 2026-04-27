@@ -54,6 +54,10 @@ ergoproxy:
   jwt:
     secret: ${JWT_SECRET}
     expiration: ${JWT_EXPIRATION}
+  cors:
+    allowed:
+      production: ${CORS_ALLOWED_PRODUCTION}
+      development: ${CORS_ALLOWED_DEVELOPMENT}
 
   pepper:
     secret: ${PEPPER}
@@ -66,13 +70,13 @@ logging:
     com.ergoproxy: info
     org:
         springframework:
-            security: debug
-            web: debug
+            security: warn
+            web: warn
         com.zaxxer:
-            hikari: debug
-        flyway: debug
+            hikari: warn
+        flyway: warn
         hibernate:
-            SQL: debug
+            SQL: warn
             type:
             descriptor:
                 sql:

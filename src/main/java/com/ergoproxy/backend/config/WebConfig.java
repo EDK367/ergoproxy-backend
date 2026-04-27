@@ -1,5 +1,6 @@
-package com.ergoproxy.backend;
+package com.ergoproxy.backend.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -9,10 +10,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebSecurity
 public class WebConfig implements WebMvcConfigurer {
 
+    @Value("${ergoproxy.cors.allowed.development}")
+    private String develoment;
+
+    @Value("${ergoproxy.cors.allowed.production}")
+    private String production;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173", "https://ergoproxy.com")
+                .allowedOrigins(develoment, production)
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")
                 .allowCredentials(true);
