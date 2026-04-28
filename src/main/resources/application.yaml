@@ -1,6 +1,13 @@
 server:
   port: 8080
   address: 0.0.0.0
+
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
+
 spring:
   application:
     name: ergoproxy-backend
