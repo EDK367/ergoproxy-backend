@@ -1,13 +1,14 @@
+FROM maven:3.9.9-eclipse-temurin-21 AS build
+
+WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
+
 FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
 
-COPY target/ergoproxy-backend-0.0.1-SNAPSHOT.jar ergoproxy-backend.jar
-
-ENTRYPOINT ["java", "-jar", "ergoproxy-backend.jar"]
-
-
-# instrucciones
-# docker build -t ergoproxy-backend .
+ENTRYPOINT ["java", "-jar", "app.jar"]

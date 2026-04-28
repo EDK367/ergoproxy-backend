@@ -57,7 +57,6 @@ ergoproxy:
   cors:
     allowed:
       production: ${CORS_ALLOWED_PRODUCTION}
-      development: ${CORS_ALLOWED_DEVELOPMENT}
 
   pepper:
     secret: ${PEPPER}

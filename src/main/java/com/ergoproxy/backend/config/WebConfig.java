@@ -10,8 +10,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebSecurity
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${ergoproxy.cors.allowed.development}")
-    private String develoment;
 
     @Value("${ergoproxy.cors.allowed.production}")
     private String production;
@@ -19,7 +17,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(develoment, production)
+                .allowedOrigins(production)
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")
                 .allowCredentials(true);
